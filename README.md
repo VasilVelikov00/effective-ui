@@ -25,7 +25,7 @@ npm install @vasilvelikov/effective-ui
 
 ---
 
-### 🚀 Usage
+### 🚀 Quick Start
 
 ```typescript
 import { tag, text, children, mount } from '@vasilvelikov/effective-ui';
@@ -48,7 +48,7 @@ npm install
 npm run preview
 ```
 
-Then open http://localhost:5173
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
@@ -63,10 +63,12 @@ dev/      → local demo app using the framework
 
 ### 🔧 TODO (Open to Contributions)
 
-- [ ] Control flow helpers
-- [ ] Signals for re-rendering
-- [ ] Effect-based context system
-- [ ] JSX or template DSL (optional)
-- [ ] SSR/streaming support
+- Control flow helpers - _planned_
+- Signals for re-rendering - _planned_
+- SSR/streaming support - _planned_
+- Effect-based context system - _maybe_
+- JSX or template DSL (optional) - _maybe_
 
-Want to contribute? See the [Contributing Guide](CONTRIBUTING.md).
+Want to contribute? See the [Contributing Guide](https://github.com/VasilVelikov00/effective-ui/blob/main/CONTRIBUTING.md).
+
+See [CHANGELOG.md](https://github.com/VasilVelikov00/effective-ui/blob/main/CHANGELOG.md) for release history.
