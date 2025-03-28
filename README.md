@@ -1,5 +1,9 @@
 # effective-ui
 
+[![npm version](https://img.shields.io/npm/v/@vasilvelikov/effective-ui)](https://www.npmjs.com/package/@vasilvelikov/effective-ui)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 **Composable, effect-based UI framework built on [Effect.ts](https://effect.website)**
 
 > 🧪 Experimental — work in progress. The API is unstable and subject to change.
