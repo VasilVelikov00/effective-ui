@@ -8,16 +8,17 @@ import {
   router,
   tag,
   text,
+  useSignal,
   withData,
   withFallback,
+  withSignal,
 } from '../src';
 
 const Home = () =>
   tag(
     'main',
-    {},
     children(
-      tag('h1', {}, children(text('Home'))),
+      tag('h1', children(text('Home'))),
       tag(
         'button',
         { onClick: navigate('/about') },
@@ -39,14 +40,9 @@ const Home = () =>
 const About = () =>
   tag(
     'main',
-    {},
     children(
-      tag('h1', {}, children(text('About'))),
-      tag(
-        'button',
-        { onClick: navigate('/home') },
-        children(text('Go to Home'))
-      ),
+      tag('h1', children(text('About'))),
+      tag('button', { onClick: navigate('/') }, children(text('Go to Home'))),
       tag(
         'button',
         { onClick: navigate('/users/1') },
@@ -88,8 +84,7 @@ const fetchPosts = (userId: number) =>
 const renderPosts = (posts: { title: string }[]) =>
   tag(
     'div',
-    {},
-    children(...posts.map((post) => tag('p', {}, children(text(post.title)))))
+    children(...posts.map((post) => tag('p', children(text(post.title)))))
   );
 
 const Posts = withFallback(withData(fetchPosts, renderPosts), {
@@ -97,11 +92,37 @@ const Posts = withFallback(withData(fetchPosts, renderPosts), {
   error: (err) => text(`Oops: ${err._tag}`),
 });
 
+const count = useSignal(0);
+
+const Counter = withSignal(count, (value) =>
+  tag(
+    'div',
+    children(
+      tag('h1', children(text(`Count: ${value}`))),
+      tag(
+        'button',
+        {
+          onClick: count.update((value) => value - 1),
+        },
+        children(text('-'))
+      ),
+      tag(
+        'button',
+        {
+          onClick: count.update((value) => value + 1),
+        },
+        children(text('+'))
+      )
+    )
+  )
+);
+
 const App = router({
   '/': Home,
   '/about': About,
   '/users/:userId': ({ path: { userId } }) => UserProfile(Number(userId)),
   '/posts': ({ search }) => Posts(Number(search.get('userId') || 0)),
+  '/counter': () => Counter,
 });
 
 Effect.runPromise(mount(App, '#root'));

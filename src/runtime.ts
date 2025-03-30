@@ -4,11 +4,11 @@ class ElementNotFoundError {
   readonly _tag = 'ElementNotFoundError';
 }
 
-export const mount = (
+export function mount(
   effect: Effect.Effect<Node>,
   selector: string
-): Effect.Effect<Node, ElementNotFoundError> =>
-  pipe(
+): Effect.Effect<Node, ElementNotFoundError> {
+  return pipe(
     Effect.sync(() => document.querySelector(selector)),
     Effect.flatMap((el) =>
       el === null
@@ -19,6 +19,7 @@ export const mount = (
           )
     )
   );
+}
 
 type MemoCache = Map<string, Node>;
 

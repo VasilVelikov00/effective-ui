@@ -28,13 +28,43 @@ const runVoidEffect = (eff: Effect.Effect<void>) => {
   void Effect.runPromise(eff);
 };
 
-export const tag = <K extends keyof HTMLElementTagNameMap>(
+export function tag<K extends keyof HTMLElementTagNameMap>(
+  tagName: K
+): Effect.Effect<HTMLElementTagNameMap[K]>;
+
+export function tag<K extends keyof HTMLElementTagNameMap>(
   tagName: K,
-  props: TagProps<K> = {},
-  children: Effect.Effect<Node[]> = Effect.succeed([])
-): Effect.Effect<HTMLElementTagNameMap[K]> =>
-  pipe(
-    Effect.sync(() => document.createElement(tagName)),
+  props: TagProps<K>
+): Effect.Effect<HTMLElementTagNameMap[K]>;
+
+export function tag<K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  children: Effect.Effect<Node[]>
+): Effect.Effect<HTMLElementTagNameMap[K]>;
+
+export function tag<K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  props: TagProps<K>,
+  children: Effect.Effect<Node[]>
+): Effect.Effect<HTMLElementTagNameMap[K]>;
+
+export function tag<K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  maybePropsOrChildren?: TagProps<K> | Effect.Effect<Node[]>,
+  maybeChildren?: Effect.Effect<Node[]>
+): Effect.Effect<HTMLElementTagNameMap[K]> {
+  const isChildrenOnly = Effect.isEffect(maybePropsOrChildren);
+
+  const props = (isChildrenOnly ? {} : maybePropsOrChildren) as TagProps<K>;
+  const children = isChildrenOnly
+    ? (maybePropsOrChildren as Effect.Effect<Node[]>)
+    : (maybeChildren ?? Effect.succeed([]));
+
+  return pipe(
+    Effect.sync(() => {
+      console.log(`Creating element: ${tagName}`);
+      return document.createElement(tagName);
+    }),
     Effect.tap((el) =>
       Effect.sync(() => {
         for (const [key, value] of Object.entries(props)) {
@@ -63,9 +93,13 @@ export const tag = <K extends keyof HTMLElementTagNameMap>(
       )
     )
   );
+}
 
 export const text = (content: string): Effect.Effect<Text> =>
-  Effect.sync(() => document.createTextNode(content));
+  Effect.sync(() => {
+    console.log(`Creating text node: ${content}`);
+    return document.createTextNode(content);
+  });
 
 export const children = (
   ...nodes: Effect.Effect<Node>[]

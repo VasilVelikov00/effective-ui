@@ -1,5 +1,8 @@
 import { Effect, pipe } from 'effect';
 
+/**
+ * Represents a network-level error during fetch.
+ */
 class FetchError {
   readonly _tag = 'FetchError';
   constructor(
@@ -9,6 +12,9 @@ class FetchError {
   ) {}
 }
 
+/**
+ * Represents a failure to parse JSON from a response.
+ */
 class JSONParseError {
   readonly _tag = 'JSONParseError';
   constructor(
@@ -17,6 +23,14 @@ class JSONParseError {
   ) {}
 }
 
+/**
+ * Fetches and parses a JSON response with typed error handling.
+ *
+ * @template T - The expected shape of the parsed JSON data.
+ * @param url - The resource URL to fetch.
+ * @param options - Optional fetch configuration.
+ * @returns An Effect producing the parsed result or a typed error.
+ */
 export const fetchJSON = <T>(
   url: string,
   options?: RequestInit
@@ -43,21 +57,42 @@ export const fetchJSON = <T>(
     )
   );
 
-export function withData<I, O, E = never>(
-  load: (input: I) => Effect.Effect<O, E>,
-  render: (data: O) => Effect.Effect<Node>
-): (input: I) => Effect.Effect<Node, E> {
-  return (input) => pipe(load(input), Effect.flatMap(render));
-}
+/**
+ * Wraps an async data loader and renderer into a single effectful component function.
+ *
+ * @template I - The input type.
+ * @template O - The output type.
+ * @template E - The error type.
+ * @param load - A function that loads the data asynchronously.
+ * @param render - A function that renders a DOM node from the loaded data.
+ * @returns A function that takes input and returns a DOM-producing Effect.
+ */
+export const withData =
+  <I, O, E = never>(
+    load: (input: I) => Effect.Effect<O, E>,
+    render: (data: O) => Effect.Effect<Node>
+  ): ((input: I) => Effect.Effect<Node, E>) =>
+  (input) =>
+    pipe(load(input), Effect.flatMap(render));
 
-export function withFallback<I, E>(
-  effectFn: (input: I) => Effect.Effect<Node, E>,
-  fallback: {
-    loading: () => Effect.Effect<Node>;
-    error: (err: E) => Effect.Effect<Node>;
-  }
-): (input: I) => Effect.Effect<Node> {
-  return (input) =>
+/**
+ * Enhances a data effect with loading and error fallback rendering.
+ *
+ * @template I - Input type to the effect.
+ * @template E - Error type the effect may throw.
+ * @param effectFn - The data effect that produces a DOM node.
+ * @param fallback - A fallback object containing `loading` and `error` renderers.
+ * @returns A function that wraps the effect in loading/error UI.
+ */
+export const withFallback =
+  <I, E>(
+    effectFn: (input: I) => Effect.Effect<Node, E>,
+    fallback: {
+      loading: () => Effect.Effect<Node>;
+      error: (err: E) => Effect.Effect<Node>;
+    }
+  ): ((input: I) => Effect.Effect<Node>) =>
+  (input) =>
     pipe(
       fallback.loading(),
       Effect.flatMap((loadingNode) =>
@@ -79,4 +114,3 @@ export function withFallback<I, E>(
         })
       )
     );
-}
