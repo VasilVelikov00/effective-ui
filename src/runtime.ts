@@ -1,4 +1,5 @@
 import { Effect, pipe } from 'effect';
+import { Telemetry } from './telemetry';
 
 class ElementNotFoundError {
   readonly _tag = 'ElementNotFoundError';
@@ -31,7 +32,8 @@ function stableHash(input: unknown): string {
 
 export function memoizePipe<I>(
   fn: (input: I) => Effect.Effect<Node>,
-  cache: MemoCache = defaultCache
+  source: string,
+  cache: MemoCache = defaultCache,
 ): (input: I) => Effect.Effect<Node> {
   return (input: I) =>
     Effect.sync(() => {
@@ -39,6 +41,7 @@ export function memoizePipe<I>(
       const cached = cache.get(key);
 
       if (cached) {
+        Telemetry.registerCacheHit(source, key);
         return cached.cloneNode(true);
       }
 
@@ -47,6 +50,7 @@ export function memoizePipe<I>(
           Effect.tap((el) =>
             Effect.sync(() => {
               cache.set(key, el.cloneNode(true));
+              Telemetry.registerCacheSet(source, key, input);
             })
           )
         )
@@ -55,7 +59,8 @@ export function memoizePipe<I>(
 }
 
 export function component<I>(
-  fn: (input: I) => Effect.Effect<Node>
+  fn: (input: I) => Effect.Effect<Node>,
+  name = 'anonymous'
 ): (input: I) => Effect.Effect<Node> {
-  return memoizePipe(fn);
+  return memoizePipe(fn, name);
 }

@@ -6,6 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.0.4] - 2025-03-31
+
+### Added
+- Add cache for static nodes
+- Add a global event registry
+- Add cache for events based on input
+- Add simple cache telemetry
+
+---
+
 ## [0.0.3] - 2025-03-30
 
 ### Changed

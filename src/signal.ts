@@ -125,7 +125,6 @@ export const withSignal = <A>(
             Effect.tap((node) =>
               Effect.sync(() => {
                 if (currentNode && currentNode.parentNode) {
-                  console.log(`Replacing node: ${currentNode}`);
                   currentNode.parentNode.replaceChild(node, currentNode);
                   currentNode = node;
                 }

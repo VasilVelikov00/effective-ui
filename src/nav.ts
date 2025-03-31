@@ -2,8 +2,9 @@ import { Effect } from 'effect';
 import { parse } from 'regexparam';
 
 type RouteParams = {
-  path: Record<string, string>;
-  search: URLSearchParams;
+  path: string;
+  pathParams: Record<string, string>;
+  searchParams: URLSearchParams;
 };
 
 type RouteEffect = (params: RouteParams) => Effect.Effect<Node>;
@@ -23,7 +24,7 @@ export function router(
 
     const resolve = (path: string): Effect.Effect<Node> => {
       const [pathname, query = ''] = path.split('?');
-      const search = new URLSearchParams(query);
+      const searchParams = new URLSearchParams(query);
 
       for (const { keys, pattern, effect } of matchers) {
         const match = pattern.exec(pathname);
@@ -34,10 +35,10 @@ export function router(
           pathParams[keys[i]] = match[i + 1];
         }
 
-        return effect({ path: pathParams, search });
+        return effect({ path, pathParams, searchParams });
       }
 
-      return fallback({ path: {}, search });
+      return fallback({ path, pathParams: {}, searchParams });
     };
 
     const render = (path: string) => {
@@ -46,8 +47,7 @@ export function router(
         effect.pipe(
           Effect.tap((node) =>
             Effect.sync(() => {
-              container.innerHTML = '';
-              container.appendChild(node);
+              container.replaceChildren(node);
             })
           )
         )

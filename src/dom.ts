@@ -1,5 +1,12 @@
 import { Effect, pipe } from 'effect';
 
+import {
+  ensureDelegatedListener,
+  generateEventId,
+  getCachedEventId,
+  registerEvent,
+} from './events';
+
 type EventHandler = Effect.Effect<void>;
 
 type EventName = keyof HTMLElementEventMap;
@@ -62,7 +69,6 @@ export function tag<K extends keyof HTMLElementTagNameMap>(
 
   return pipe(
     Effect.sync(() => {
-      console.log(`Creating element: ${tagName}`);
       return document.createElement(tagName);
     }),
     Effect.tap((el) =>
@@ -71,10 +77,26 @@ export function tag<K extends keyof HTMLElementTagNameMap>(
           if (key === 'style' && typeof value === 'object') {
             Object.assign(el.style, value);
           } else if (key.startsWith('on') && Effect.isEffect(value)) {
+            const effect = value as Effect.Effect<void>;
             const eventName = key.slice(2).toLowerCase();
-            el.addEventListener(eventName, () =>
-              runVoidEffect(value as Effect.Effect<void>)
+
+            const register: Effect.Effect<void, unknown, never> = Effect.gen(
+              function* () {
+                try {
+                  const cachedFn = yield* getCachedEventId;
+                  const id = yield* cachedFn(effect);
+                  el.setAttribute(`data-${eventName}-event`, id);
+                  ensureDelegatedListener(eventName);
+                } catch {
+                  const id = yield* generateEventId;
+                  el.setAttribute(`data-${eventName}-event`, id);
+                  registerEvent(id, () => runVoidEffect(effect));
+                  ensureDelegatedListener(eventName);
+                }
+              }
             );
+
+            Effect.runSync(register);
           } else if (key in el) {
             (el as Record<string, unknown>)[key] = value;
           }
@@ -97,7 +119,6 @@ export function tag<K extends keyof HTMLElementTagNameMap>(
 
 export const text = (content: string): Effect.Effect<Text> =>
   Effect.sync(() => {
-    console.log(`Creating text node: ${content}`);
     return document.createTextNode(content);
   });
 
