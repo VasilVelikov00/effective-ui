@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.0.5] - 2025-04-03
+
+### Added
+- Update README
+
+---
+
 ## [0.0.4] - 2025-03-31
 
 ### Added

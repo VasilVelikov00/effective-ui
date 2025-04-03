@@ -16,7 +16,7 @@
 - Declarative DOM via `tag`, `text`, `children`
 - Composable routing with dynamic path + query support
 - Async data fetching with loading/error fallback
-- Zero-hydration, predictable UI pipes
+- Predictable UI pipes
 - Pure, memoizable components (no diffing or VDOM)
 
 ---
