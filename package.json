@@ -1,6 +1,6 @@
 {
   "name": "@vasilvelikov/effective-ui",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Composable, effect-based UI framework built on Effect.ts",
   "type": "module",
   "main": "dist/index.js",
