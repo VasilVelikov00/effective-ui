@@ -1,28 +1,11 @@
 {
   "name": "@vasilvelikov/effective-ui",
   "version": "0.0.5",
-  "description": "Composable, effect-based UI framework built on Effect.ts",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
+  "packageManager": "pnpm@9.10.0",
   "license": "MIT",
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "prepare": "tsup",
-    "clean": "rm -rf dist",
-    "preview": "vite"
-  },
+  "author": "Vasil Velikov",
+  "description": "Composable, effect-based UI framework built on Effect.ts",
   "keywords": [
     "effect",
     "effect-ts",
@@ -31,21 +14,78 @@
     "functional",
     "typescript"
   ],
-  "author": "Vasil Velikov",
-  "devDependencies": {
-    "@types/node": "^22.13.13",
-    "@typescript-eslint/eslint-plugin": "^8.28.0",
-    "@typescript-eslint/parser": "^8.28.0",
-    "eslint": "^9.23.0",
-    "eslint-plugin-prettier": "^5.2.5",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.5.3",
-    "tsup": "^8.4.0",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.3"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VasilVelikov00/effective-ui.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "codegen": "build-utils prepare-v2",
+    "build": "pnpm build-esm && pnpm build-annotate && pnpm build-cjs && build-utils pack-v2",
+    "build-esm": "tsc -b tsconfig.build.json",
+    "build-cjs": "babel build/esm --plugins @babel/transform-export-namespace-from --plugins @babel/transform-modules-commonjs --out-dir build/cjs --source-maps",
+    "build-annotate": "babel build/esm --plugins annotate-pure-calls --out-dir build/esm --source-maps",
+    "check": "tsc -b tsconfig.json",
+    "lint": "eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
+    "lint-fix": "pnpm lint --fix",
+    "test": "vitest",
+    "coverage": "vitest --coverage",
+    "changeset-version": "changeset version && node scripts/version.mjs",
+    "changeset-publish": "pnpm build && TEST_DIST= pnpm vitest && changeset publish"
   },
   "dependencies": {
     "effect": "^3.14.2",
     "regexparam": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.8",
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-export-namespace-from": "^7.24.7",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.8",
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.8",
+    "@effect/build-utils": "^0.7.7",
+    "@effect/eslint-plugin": "^0.2.0",
+    "@effect/language-service": "^0.1.0",
+    "@effect/vitest": "latest",
+    "@eslint/compat": "1.1.1",
+    "@eslint/eslintrc": "3.1.0",
+    "@eslint/js": "9.10.0",
+    "@types/node": "^22.5.2",
+    "@typescript-eslint/eslint-plugin": "^8.4.0",
+    "@typescript-eslint/parser": "^8.4.0",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
+    "eslint": "^9.10.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-codegen": "^0.28.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.17.0",
+    "typescript": "^5.6.2",
+    "vitest": "^3.1.1"
+  },
+  "effect": {
+    "generateExports": {
+      "include": [
+        "**/*.ts"
+      ]
+    },
+    "generateIndex": {
+      "include": [
+        "**/*.ts"
+      ]
+    }
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@changesets/get-github-info@0.6.0": "patches/@changesets__get-github-info@0.6.0.patch",
+      "babel-plugin-annotate-pure-calls@0.4.0": "patches/babel-plugin-annotate-pure-calls@0.4.0.patch"
+    }
   }
 }

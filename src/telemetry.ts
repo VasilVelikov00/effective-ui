@@ -1,34 +1,34 @@
 type TelemetryEntry = {
-  source: string;
-  key: string;
-  type: 'set' | 'hit';
-  input?: unknown;
-};
+  source: string
+  key: string
+  type: "set" | "hit"
+  input?: unknown
+}
 
 class TelemetryTracker {
-  private entries: TelemetryEntry[] = [];
+  private entries: Array<TelemetryEntry> = []
 
   registerCacheSet(source: string, key: string, input?: unknown): void {
-    this.entries.push({ source, key, type: 'set', input });
-    console.log(`[Telemetry] Cached: ${source} [${key}]`);
+    this.entries.push({ source, key, type: "set", input })
+    console.log(`[Telemetry] Cached: ${source} [${key}]`)
   }
 
   registerCacheHit(source: string, key: string): void {
-    this.entries.push({ source, key, type: 'hit' });
-    console.log(`[Telemetry] Reused: ${source} [${key}]`);
+    this.entries.push({ source, key, type: "hit" })
+    console.log(`[Telemetry] Reused: ${source} [${key}]`)
   }
 
   report(): void {
-    console.table(this.entries);
+    console.table(this.entries)
   }
 
   reset(): void {
-    this.entries = [];
+    this.entries = []
   }
 
-  getAll(): TelemetryEntry[] {
-    return [...this.entries];
+  getAll(): Array<TelemetryEntry> {
+    return [...this.entries]
   }
 }
 
-export const Telemetry = new TelemetryTracker();
+export const Telemetry = new TelemetryTracker()

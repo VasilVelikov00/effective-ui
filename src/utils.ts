@@ -1,10 +1,10 @@
-import { Effect, pipe } from 'effect';
+import { Effect, pipe } from "effect"
 
 /**
  * Represents a network-level error during fetch.
  */
 class FetchError {
-  readonly _tag = 'FetchError';
+  readonly _tag = "FetchError"
   constructor(
     public readonly url: string,
     public readonly status: number,
@@ -16,7 +16,7 @@ class FetchError {
  * Represents a failure to parse JSON from a response.
  */
 class JSONParseError {
-  readonly _tag = 'JSONParseError';
+  readonly _tag = "JSONParseError"
   constructor(
     public readonly url: string,
     public readonly cause: unknown
@@ -43,19 +43,19 @@ export const fetchJSON = <T>(
           url,
           0,
           err instanceof Error ? err.message : String(err)
-        ),
+        )
     }),
     Effect.flatMap((res) =>
       res.ok
         ? Effect.tryPromise<T, JSONParseError>({
-            try: () => res.json(),
-            catch: (err) => new JSONParseError(url, err),
-          })
+          try: () => res.json(),
+          catch: (err) => new JSONParseError(url, err)
+        })
         : Effect.fail<FetchError | JSONParseError>(
-            new FetchError(url, res.status, res.statusText)
-          )
+          new FetchError(url, res.status, res.statusText)
+        )
     )
-  );
+  )
 
 /**
  * Wraps an async data loader and renderer into a single effectful component function.
@@ -67,13 +67,11 @@ export const fetchJSON = <T>(
  * @param render - A function that renders a DOM node from the loaded data.
  * @returns A function that takes input and returns a DOM-producing Effect.
  */
-export const withData =
-  <I, O, E = never>(
-    load: (input: I) => Effect.Effect<O, E>,
-    render: (data: O) => Effect.Effect<Node>
-  ): ((input: I) => Effect.Effect<Node, E>) =>
-  (input) =>
-    pipe(load(input), Effect.flatMap(render));
+export const withData = <I, O, E = never>(
+  load: (input: I) => Effect.Effect<O, E>,
+  render: (data: O) => Effect.Effect<Node>
+): (input: I) => Effect.Effect<Node, E> =>
+(input) => pipe(load(input), Effect.flatMap(render))
 
 /**
  * Enhances a data effect with loading and error fallback rendering.
@@ -84,33 +82,32 @@ export const withData =
  * @param fallback - A fallback object containing `loading` and `error` renderers.
  * @returns A function that wraps the effect in loading/error UI.
  */
-export const withFallback =
-  <I, E>(
-    effectFn: (input: I) => Effect.Effect<Node, E>,
-    fallback: {
-      loading: () => Effect.Effect<Node>;
-      error: (err: E) => Effect.Effect<Node>;
-    }
-  ): ((input: I) => Effect.Effect<Node>) =>
-  (input) =>
-    pipe(
-      fallback.loading(),
-      Effect.flatMap((loadingNode) =>
-        Effect.sync(() => {
-          const wrapper = document.createElement('div');
-          wrapper.appendChild(loadingNode);
+export const withFallback = <I, E>(
+  effectFn: (input: I) => Effect.Effect<Node, E>,
+  fallback: {
+    loading: () => Effect.Effect<Node>
+    error: (err: E) => Effect.Effect<Node>
+  }
+): (input: I) => Effect.Effect<Node> =>
+(input) =>
+  pipe(
+    fallback.loading(),
+    Effect.flatMap((loadingNode) =>
+      Effect.sync(() => {
+        const wrapper = document.createElement("div")
+        wrapper.appendChild(loadingNode)
 
-          Effect.runPromise(
-            effectFn(input).pipe(
-              Effect.catchAll(fallback.error),
-              Effect.map((finalNode) => {
-                wrapper.innerHTML = '';
-                wrapper.appendChild(finalNode);
-              })
-            )
-          );
+        Effect.runPromise(
+          effectFn(input).pipe(
+            Effect.catchAll(fallback.error),
+            Effect.map((finalNode) => {
+              wrapper.innerHTML = ""
+              wrapper.appendChild(finalNode)
+            })
+          )
+        )
 
-          return wrapper;
-        })
-      )
-    );
+        return wrapper
+      })
+    )
+  )

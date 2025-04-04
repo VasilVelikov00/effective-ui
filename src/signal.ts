@@ -1,6 +1,6 @@
-import { Effect, Ref } from 'effect';
+import { Effect, Ref } from "effect"
 
-type Subscriber = () => void;
+type Subscriber = () => void
 
 /**
  * A reactive signal that stores a value and notifies subscribers on change.
@@ -8,19 +8,19 @@ type Subscriber = () => void;
  * @template A The type of the stored value.
  */
 class Signal<A> {
-  private readonly value: Ref.Ref<A>;
-  private readonly subscribers: Ref.Ref<Set<Subscriber>>;
+  private readonly value: Ref.Ref<A>
+  private readonly subscribers: Ref.Ref<Set<Subscriber>>
 
   constructor(initial: A) {
-    this.value = Ref.unsafeMake(initial);
-    this.subscribers = Ref.unsafeMake(new Set());
+    this.value = Ref.unsafeMake(initial)
+    this.subscribers = Ref.unsafeMake(new Set())
   }
 
   /**
    * Reads the current value of the signal.
    */
   get(): Effect.Effect<A> {
-    return Ref.get(this.value);
+    return Ref.get(this.value)
   }
 
   /**
@@ -29,14 +29,14 @@ class Signal<A> {
    * @param next The new value to assign to the signal.
    */
   set(next: A): Effect.Effect<void> {
-    const valueRef = this.value;
-    const subsRef = this.subscribers;
+    const valueRef = this.value
+    const subsRef = this.subscribers
 
-    return Effect.gen(function* () {
-      yield* Ref.set(valueRef, next);
-      const subs = yield* Ref.get(subsRef);
-      subs.forEach((fn) => fn());
-    });
+    return Effect.gen(function*() {
+      yield* Ref.set(valueRef, next)
+      const subs = yield* Ref.get(subsRef)
+      subs.forEach((fn) => fn())
+    })
   }
 
   /**
@@ -45,14 +45,14 @@ class Signal<A> {
    * @param f - The function that takes the old value and returns the new one.
    */
   update(f: (prev: A) => A): Effect.Effect<void> {
-    const valueRef = this.value;
-    const subsRef = this.subscribers;
+    const valueRef = this.value
+    const subsRef = this.subscribers
 
-    return Effect.gen(function* () {
-      yield* Ref.set(valueRef, f(yield* valueRef));
-      const subs = yield* Ref.get(subsRef);
-      subs.forEach((fn) => fn());
-    });
+    return Effect.gen(function*() {
+      yield* Ref.set(valueRef, f(yield* valueRef))
+      const subs = yield* Ref.get(subsRef)
+      subs.forEach((fn) => fn())
+    })
   }
 
   /**
@@ -62,10 +62,10 @@ class Signal<A> {
    */
   subscribe(fn: Subscriber): Effect.Effect<void> {
     return Ref.update(this.subscribers, (subs) => {
-      const next = new Set(subs);
-      next.add(fn);
-      return next;
-    });
+      const next = new Set(subs)
+      next.add(fn)
+      return next
+    })
   }
 
   /**
@@ -75,10 +75,10 @@ class Signal<A> {
    */
   unsubscribe(fn: Subscriber): Effect.Effect<void> {
     return Ref.update(this.subscribers, (subs) => {
-      const next = new Set(subs);
-      next.delete(fn);
-      return next;
-    });
+      const next = new Set(subs)
+      next.delete(fn)
+      return next
+    })
   }
 }
 
@@ -88,7 +88,7 @@ class Signal<A> {
  * @template A The type of the signal value.
  * @param initial The initial value.
  */
-export const useSignal = <A>(initial: A): Signal<A> => new Signal(initial);
+export const useSignal = <A>(initial: A): Signal<A> => new Signal(initial)
 
 /**
  * Creates a DOM node that automatically re-renders whenever the signal changes.
@@ -103,19 +103,19 @@ export const withSignal = <A>(
   render: (value: A) => Effect.Effect<Node>
 ): Effect.Effect<Node> =>
   Effect.async<Node>((resume) => {
-    let currentNode: Node;
+    let currentNode: Node
 
     Effect.runPromise(
       signal.get().pipe(
         Effect.flatMap(render),
         Effect.tap((node) =>
           Effect.sync(() => {
-            currentNode = node;
-            resume(Effect.succeed(node));
+            currentNode = node
+            resume(Effect.succeed(node))
           })
         )
       )
-    );
+    )
 
     void Effect.runPromise(
       signal.subscribe(() => {
@@ -125,13 +125,13 @@ export const withSignal = <A>(
             Effect.tap((node) =>
               Effect.sync(() => {
                 if (currentNode && currentNode.parentNode) {
-                  currentNode.parentNode.replaceChild(node, currentNode);
-                  currentNode = node;
+                  currentNode.parentNode.replaceChild(node, currentNode)
+                  currentNode = node
                 }
               })
             )
           )
-        );
+        )
       })
-    );
-  });
+    )
+  })

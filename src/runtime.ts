@@ -1,8 +1,8 @@
-import { Effect, pipe } from 'effect';
-import { Telemetry } from './telemetry';
+import { Effect, pipe } from "effect"
+import { Telemetry } from "./telemetry.js"
 
 class ElementNotFoundError {
-  readonly _tag = 'ElementNotFoundError';
+  readonly _tag = "ElementNotFoundError"
 }
 
 export function mount(
@@ -15,52 +15,52 @@ export function mount(
       el === null
         ? Effect.fail(new ElementNotFoundError())
         : pipe(
-            effect,
-            Effect.map((node) => el.appendChild(node))
-          )
+          effect,
+          Effect.map((node) => el.appendChild(node))
+        )
     )
-  );
+  )
 }
 
-type MemoCache = Map<string, Node>;
+type MemoCache = Map<string, Node>
 
-const defaultCache: MemoCache = new Map();
+const defaultCache: MemoCache = new Map()
 
 function stableHash(input: unknown): string {
-  return JSON.stringify(input);
+  return JSON.stringify(input)
 }
 
 export function memoizePipe<I>(
   fn: (input: I) => Effect.Effect<Node>,
   source: string,
-  cache: MemoCache = defaultCache,
+  cache: MemoCache = defaultCache
 ): (input: I) => Effect.Effect<Node> {
   return (input: I) =>
     Effect.sync(() => {
-      const key = stableHash(input);
-      const cached = cache.get(key);
+      const key = stableHash(input)
+      const cached = cache.get(key)
 
       if (cached) {
-        Telemetry.registerCacheHit(source, key);
-        return cached.cloneNode(true);
+        Telemetry.registerCacheHit(source, key)
+        return cached.cloneNode(true)
       }
 
       return Effect.runSync(
         fn(input).pipe(
           Effect.tap((el) =>
             Effect.sync(() => {
-              cache.set(key, el.cloneNode(true));
-              Telemetry.registerCacheSet(source, key, input);
+              cache.set(key, el.cloneNode(true))
+              Telemetry.registerCacheSet(source, key, input)
             })
           )
         )
-      );
-    });
+      )
+    })
 }
 
 export function component<I>(
   fn: (input: I) => Effect.Effect<Node>,
-  name = 'anonymous'
+  name = "anonymous"
 ): (input: I) => Effect.Effect<Node> {
-  return memoizePipe(fn, name);
+  return memoizePipe(fn, name)
 }
