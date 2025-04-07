@@ -33,8 +33,9 @@
     "lint-fix": "pnpm lint --fix",
     "test": "vitest",
     "coverage": "vitest --coverage",
-    "changeset-version": "changeset version && node scripts/version.mjs",
-    "changeset-publish": "pnpm build && TEST_DIST= pnpm vitest && changeset publish"
+    "changeset-version": "changeset version && tsx scripts/version.ts",
+    "changeset-publish": "pnpm build && TEST_DIST= pnpm vitest && changeset publish",
+    "example": "tsx scripts/run-example.ts"
   },
   "dependencies": {
     "effect": "^3.14.2",
@@ -50,7 +51,7 @@
     "@effect/build-utils": "^0.7.7",
     "@effect/eslint-plugin": "^0.2.0",
     "@effect/language-service": "^0.1.0",
-    "@effect/vitest": "latest",
+    "@effect/vitest": "^0.20.5",
     "@eslint/compat": "1.1.1",
     "@eslint/eslintrc": "3.1.0",
     "@eslint/js": "9.10.0",
@@ -65,6 +66,7 @@
     "eslint-plugin-prettier": "^5.2.6",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "jsdom": "^26.0.0",
     "prettier": "^3.5.3",
     "tsx": "^4.17.0",
     "typescript": "^5.6.2",

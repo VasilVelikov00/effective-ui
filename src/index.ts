@@ -1,5 +1,5 @@
 export * from "./dom.js"
+export * from "./events.js"
 export * from "./nav.js"
 export * from "./runtime.js"
-export * from "./signal.js"
 export * from "./utils.js"

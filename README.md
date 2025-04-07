@@ -6,11 +6,11 @@
 
 **Composable, effect-based UI framework built on [Effect.ts](https://effect.website)**
 
-> 🧪 Experimental — work in progress. The API is unstable and subject to change.
+> Experimental — work in progress. The API is unstable and subject to change.
 
 ---
 
-### ✨ Features
+### Features
 
 - Everything is an `Effect`
 - Declarative DOM via `tag`, `text`, `children`
@@ -21,21 +21,21 @@
 
 ---
 
-### 📦 Installation
+### Installation
 
 ```bash
-npm install @vasilvelikov/effective-ui
+pnpm install @vasilvelikov/effective-ui
 ```
 
 ---
 
-### 🚀 Quick Start
+### Quick Start
 
 ```typescript
 import { tag, text, children, mount } from '@vasilvelikov/effective-ui';
 
-const App = tag('div', {}, children(
-  tag('h1', {}, children(text('Hello from effective-ui')))
+const App = tag('div', children(
+  tag('h1', children(text('Hello from effective-ui')))
 ));
 
 Effect.runPromise(mount(App, '#root'));
@@ -43,35 +43,33 @@ Effect.runPromise(mount(App, '#root'));
 
 ---
 
-### 🧪 Dev Preview
+### Dev Preview
 
-This repo includes a local demo using Vite.
+This repo includes examples that you can run locally.
 
 ```bash
-npm install
-npm run preview
+pnpm install
+pnpm run example counter
 ```
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-### 📁 Project Structure
+### Project Structure
 
 ```text
-src/      → the core UI framework
-dev/      → local demo app using the framework
+src/           → the core UI framework
+examples/      → runnable examples
 ```
 
 ---
 
 ### 🔧 TODO (Open to Contributions)
 
-- Control flow helpers - _planned_
-- Signals for re-rendering - _planned_
-- SSR/streaming support - _planned_
-- Effect-based context system - _maybe_
-- JSX or template DSL (optional) - _maybe_
+- Predefined components - _planned_
+- Theming - _planned_
+- SSR/streaming support - _maybe_
 
 Want to contribute? See the [Contributing Guide](https://github.com/VasilVelikov00/effective-ui/blob/main/CONTRIBUTING.md).
 

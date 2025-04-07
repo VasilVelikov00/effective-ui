@@ -1,6 +1,6 @@
-import { Effect, pipe } from "effect"
+import { Effect } from "effect"
 
-import { ensureDelegatedListener, generateEventId, getCachedEventId, registerEvent } from "./events.js"
+import { EventRegistry } from "./events.js"
 
 type EventHandler = Effect.Effect<void>
 
@@ -26,35 +26,11 @@ export type TagProps<K extends keyof HTMLElementTagNameMap> = Partial<
   }
 >
 
-const runVoidEffect = (eff: Effect.Effect<void>) => {
-  void Effect.runPromise(eff)
-}
-
-export function tag<K extends keyof HTMLElementTagNameMap>(
-  tagName: K
-): Effect.Effect<HTMLElementTagNameMap[K]>
-
 export function tag<K extends keyof HTMLElementTagNameMap>(
   tagName: K,
-  props: TagProps<K>
-): Effect.Effect<HTMLElementTagNameMap[K]>
-
-export function tag<K extends keyof HTMLElementTagNameMap>(
-  tagName: K,
-  children: Effect.Effect<Array<Node>>
-): Effect.Effect<HTMLElementTagNameMap[K]>
-
-export function tag<K extends keyof HTMLElementTagNameMap>(
-  tagName: K,
-  props: TagProps<K>,
-  children: Effect.Effect<Array<Node>>
-): Effect.Effect<HTMLElementTagNameMap[K]>
-
-export function tag<K extends keyof HTMLElementTagNameMap>(
-  tagName: K,
-  maybePropsOrChildren?: TagProps<K> | Effect.Effect<Array<Node>>,
-  maybeChildren?: Effect.Effect<Array<Node>>
-): Effect.Effect<HTMLElementTagNameMap[K]> {
+  maybePropsOrChildren?: TagProps<K> | Effect.Effect<Array<Node>, never, EventRegistry>,
+  maybeChildren?: Effect.Effect<Array<Node>, never, EventRegistry>
+): Effect.Effect<HTMLElementTagNameMap[K], never, EventRegistry> {
   const isChildrenOnly = Effect.isEffect(maybePropsOrChildren)
 
   const props = (isChildrenOnly ? {} : maybePropsOrChildren) as TagProps<K>
@@ -62,54 +38,29 @@ export function tag<K extends keyof HTMLElementTagNameMap>(
     ? (maybePropsOrChildren as Effect.Effect<Array<Node>>)
     : (maybeChildren ?? Effect.succeed([]))
 
-  return pipe(
-    Effect.sync(() => {
-      return document.createElement(tagName)
-    }),
-    Effect.tap((el) =>
-      Effect.sync(() => {
-        for (const [key, value] of Object.entries(props)) {
-          if (key === "style" && typeof value === "object") {
-            Object.assign(el.style, value)
-          } else if (key.startsWith("on") && Effect.isEffect(value)) {
-            const effect = value as Effect.Effect<void>
-            const eventName = key.slice(2).toLowerCase()
+  return Effect.gen(function*() {
+    const el = document.createElement(tagName)
 
-            const register: Effect.Effect<void, unknown, never> = Effect.gen(
-              function*() {
-                try {
-                  const cachedFn = yield* getCachedEventId
-                  const id = yield* cachedFn(effect)
-                  el.setAttribute(`data-${eventName}-event`, id)
-                  ensureDelegatedListener(eventName)
-                } catch {
-                  const id = yield* generateEventId
-                  el.setAttribute(`data-${eventName}-event`, id)
-                  registerEvent(id, () => runVoidEffect(effect))
-                  ensureDelegatedListener(eventName)
-                }
-              }
-            )
+    for (const [key, value] of Object.entries(props)) {
+      if (key === "style" && typeof value === "object") {
+        Object.assign(el.style, value)
+      } else if (key.startsWith("on") && Effect.isEffect(value)) {
+        const eventName = key.slice(2).toLowerCase()
+        const registry = yield* EventRegistry
+        const id = yield* registry.register(eventName, value as Effect.Effect<void>)
+        el.setAttribute(`data-${eventName}-event`, id)
+      } else {
+        ;(el as Record<string, unknown>)[key] = value
+      }
+    }
 
-            Effect.runSync(register)
-          } else if (key in el) {
-            ;(el as Record<string, unknown>)[key] = value
-          }
-        }
-      })
-    ),
-    Effect.flatMap((el) =>
-      pipe(
-        children,
-        Effect.tap((nodes) =>
-          Effect.sync(() => {
-            nodes.forEach((child) => el.appendChild(child))
-          })
-        ),
-        Effect.map(() => el)
-      )
-    )
-  )
+    const nodeList = yield* children
+    for (const child of nodeList) {
+      el.appendChild(child)
+    }
+
+    return el
+  })
 }
 
 export const text = (content: string): Effect.Effect<Text> =>
@@ -118,5 +69,5 @@ export const text = (content: string): Effect.Effect<Text> =>
   })
 
 export const children = (
-  ...nodes: Array<Effect.Effect<Node>>
-): Effect.Effect<Array<Node>> => Effect.all(nodes)
+  ...nodes: Array<Effect.Effect<Node, never, EventRegistry>>
+): Effect.Effect<Array<Node>, never, EventRegistry> => Effect.all(nodes)
