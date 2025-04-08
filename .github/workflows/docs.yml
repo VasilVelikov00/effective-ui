@@ -1,4 +1,4 @@
-name: Release
+name: Docs
 
 on:
   push:
@@ -15,16 +15,12 @@ jobs:
     name: Docs
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
-      id-token: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/setup
       - name: Generate TypeDoc
-        run: pnpm docs
+        run: pnpx typedoc src/index.ts
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
