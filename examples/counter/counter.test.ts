@@ -1,12 +1,14 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect } from "effect"
-import { EventRegistry } from "../../src"
+import { events } from "../../src/index.js"
 import { Counter } from "./counter"
 
 describe("Counter", () => {
   it.effect("increments and decrements", () =>
     Effect.gen(function*() {
-      const counter = yield* Counter.pipe(Effect.provide(EventRegistry.Default))
+      const counter = yield* Counter.pipe(
+        Effect.provide(events.EventRegistry.Default)
+      )
       document.body.appendChild(counter)
 
       const buttons = () => document.querySelectorAll("button")

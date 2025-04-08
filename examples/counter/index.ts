@@ -1,5 +1,5 @@
 import { Effect } from "effect"
-import { mount } from "../../src"
+import { runtime } from "../../src"
 import { Counter } from "./counter"
 
-Effect.runPromise(mount(Counter, "#root"))
+Effect.runPromise(runtime.mount(Counter, "#root"))

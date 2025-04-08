@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "@effect/vitest"
 import { Effect } from "effect"
-import { dom, events } from "src/index.js"
+import { dom, events } from "../src/index.js"
 
 describe("dom", () => {
   describe("tag", () => {
