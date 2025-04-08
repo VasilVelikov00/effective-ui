@@ -1,5 +1,6 @@
 import { Effect } from "effect"
 import { parse } from "regexparam"
+import { events } from "./index.js"
 
 type RouteParams = {
   path: string
@@ -7,7 +8,9 @@ type RouteParams = {
   searchParams: URLSearchParams
 }
 
-type RouteEffect = (params: RouteParams) => Effect.Effect<Node>
+type RouteEffect = (
+  params: RouteParams
+) => Effect.Effect<Node, never, events.EventRegistry>
 
 export function router(
   routes: Record<string, RouteEffect>,
@@ -21,7 +24,9 @@ export function router(
       return { ...parsed, effect }
     })
 
-    const resolve = (path: string): Effect.Effect<Node> => {
+    const resolve = (
+      path: string
+    ): Effect.Effect<Node, never, events.EventRegistry> => {
       const [pathname, query = ""] = path.split("?")
       const searchParams = new URLSearchParams(query)
 
@@ -48,7 +53,8 @@ export function router(
             Effect.sync(() => {
               container.replaceChildren(node)
             })
-          )
+          ),
+          Effect.provide(events.EventRegistry.Default)
         )
       )
     }

@@ -1,5 +1,5 @@
 import { Effect } from "effect"
-import { Telemetry } from "./telemetry.js"
+import { events, telemetry } from "./index.js"
 
 class ElementNotFoundError {
   readonly _tag = "ElementNotFoundError"
@@ -25,7 +25,7 @@ function stableHash(input: unknown): string {
 }
 
 export function memoizePipe<I>(
-  fn: (input: I) => Effect.Effect<Node>,
+  fn: (input: I) => Effect.Effect<Node, never, events.EventRegistry>,
   source: string,
   cache: MemoCache = defaultCache
 ): (input: I) => Effect.Effect<Node> {
@@ -35,7 +35,7 @@ export function memoizePipe<I>(
       const cached = cache.get(key)
 
       if (cached) {
-        Telemetry.registerCacheHit(source, key)
+        telemetry.Telemetry.registerCacheHit(source, key)
         return cached.cloneNode(true)
       }
 
@@ -44,24 +44,28 @@ export function memoizePipe<I>(
           Effect.tap((el) =>
             Effect.sync(() => {
               cache.set(key, el.cloneNode(true))
-              Telemetry.registerCacheSet(source, key, input)
+              telemetry.Telemetry.registerCacheSet(source, key, input)
             })
-          )
+          ),
+          Effect.provide(events.EventRegistry.Default)
         )
       )
     })
 }
 
 export function component<I>(
-  fn: (input: I) => Effect.Effect<Node>,
+  fn: (input: I) => Effect.Effect<Node, never, events.EventRegistry>,
   name = "anonymous"
-): (input: I) => Effect.Effect<Node> {
+): (input: I) => Effect.Effect<Node, never, events.EventRegistry> {
   return memoizePipe(fn, name)
 }
 
 export function recurse<I>(
   initial: I,
-  fn: (current: I, setNext: (next: I) => Effect.Effect<void>) => Effect.Effect<Node>
+  fn: (
+    current: I,
+    setNext: (next: I) => Effect.Effect<void>
+  ) => Effect.Effect<Node>
 ): Effect.Effect<Node> {
   return Effect.async<Node>((resume) => {
     let currentNode: Node | null = null

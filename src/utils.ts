@@ -1,4 +1,5 @@
 import { Effect, pipe } from "effect"
+import { events } from "./index.js"
 
 /**
  * Represents a network-level error during fetch.
@@ -69,9 +70,14 @@ export const fetchJSON = <T>(
  */
 export const withData = <I, O, E = never>(
   load: (input: I) => Effect.Effect<O, E>,
-  render: (data: O) => Effect.Effect<Node>
+  render: (data: O) => Effect.Effect<Node, never, events.EventRegistry>
 ): (input: I) => Effect.Effect<Node, E> =>
-(input) => pipe(load(input), Effect.flatMap(render))
+(input) =>
+  pipe(
+    load(input),
+    Effect.flatMap(render),
+    Effect.provide(events.EventRegistry.Default)
+  )
 
 /**
  * Enhances a data effect with loading and error fallback rendering.
