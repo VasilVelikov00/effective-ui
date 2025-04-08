@@ -45,9 +45,11 @@ const App = dom.tag(
 Effect.runPromise(runtime.mount(App, "#root"));
 ```
 
+For more information check out the [docs](https://vasilvelikov00.github.io/effective-ui/)
+
 ---
 
-### Dev Preview
+### Examples
 
 This repo includes examples that you can run locally.
 
