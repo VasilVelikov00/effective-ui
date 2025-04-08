@@ -36,7 +36,8 @@
     "changeset-version": "changeset version && tsx scripts/version.ts",
     "changeset-publish": "pnpm build && TEST_DIST= pnpm vitest && changeset publish",
     "example": "tsx scripts/run-example.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "docs": "pnpx typedoc src/index.ts"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

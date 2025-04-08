@@ -14,6 +14,7 @@
 
 - Everything is an `Effect`
 - Declarative DOM via `tag`, `text`, `children`
+- Tree-shakable for smaller builds
 - Composable routing with dynamic path + query support
 - Async data fetching with loading/error fallback
 - Predictable UI pipes
@@ -32,13 +33,16 @@ pnpm install @vasilvelikov/effective-ui
 ### Quick Start
 
 ```typescript
-import { tag, text, children, mount } from '@vasilvelikov/effective-ui';
+import { dom, runtime } from "@vasilvelikov/effective-ui";
 
-const App = tag('div', children(
-  tag('h1', children(text('Hello from effective-ui')))
-));
+const App = dom.tag(
+  "div",
+  dom.children(
+    dom.tag("h1", dom.children(dom.text("Hello from effective-ui"))),
+  ),
+);
 
-Effect.runPromise(mount(App, '#root'));
+Effect.runPromise(runtime.mount(App, "#root"));
 ```
 
 ---
@@ -65,7 +69,7 @@ examples/      → runnable examples
 
 ---
 
-### 🔧 TODO (Open to Contributions)
+### TODO (Open to Contributions)
 
 - Predefined components - _planned_
 - Theming - _planned_
