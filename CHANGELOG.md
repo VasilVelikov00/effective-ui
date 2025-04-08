@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.6
+
+### Patch Changes
+
+- [`fd89e16`](https://github.com/VasilVelikov00/effective-ui/commit/fd89e161ad6572f6c90066f668d73f5c6d8e8821) Thanks @VasilVelikov00! - Remove withSignal, add recurse
+
 ## 0.0.5
 
 ### Patch Changes
