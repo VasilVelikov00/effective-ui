@@ -2,8 +2,9 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "types": ["node"],
-    "module": "ESNext",
-    "moduleResolution": "NodeNext"
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": true
   },
   "include": ["./**/*.ts"]
 }
