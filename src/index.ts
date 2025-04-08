@@ -1,5 +1,14 @@
-export * from "./dom.js"
-export * from "./events.js"
-export * from "./nav.js"
-export * from "./runtime.js"
-export * from "./utils.js"
+export * as dom from "./dom.js";
+
+export * as events from "./events.js";
+
+export * as nav from "./nav.js";
+
+export * as runtime from "./runtime.js";
+
+export * as telemetry from "./telemetry.js";
+
+/**
+ * Represents a network-level error during fetch.
+ */
+export * as utils from "./utils.js";
