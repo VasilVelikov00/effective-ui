@@ -1,16 +1,23 @@
 import { Effect, pipe } from "effect"
-import { EventRegistry } from "../../src/events"
-import { children, recurse, tag, text } from "../../src/index.js"
+import { dom, events, runtime } from "../../src/index.js"
 
-export const Counter = recurse(0, (count, setNext) =>
+export const Counter = runtime.recurse(0, (count, setNext) =>
   pipe(
-    tag(
+    dom.tag(
       "div",
-      children(
-        tag("h1", children(text(`Count: ${count}`))),
-        tag("button", { onClick: setNext(count - 1) }, children(text("-"))),
-        tag("button", { onClick: setNext(count + 1) }, children(text("+")))
+      dom.children(
+        dom.tag("h1", dom.children(dom.text(`Count: ${count}`))),
+        dom.tag(
+          "button",
+          { onClick: setNext(count - 1) },
+          dom.children(dom.text("-"))
+        ),
+        dom.tag(
+          "button",
+          { onClick: setNext(count + 1) },
+          dom.children(dom.text("+"))
+        )
       )
     ),
-    Effect.provide(EventRegistry.Default)
+    Effect.provide(events.EventRegistry.Default)
   ))
