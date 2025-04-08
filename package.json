@@ -40,9 +40,9 @@
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
+      "pnpm codegen",
       "pnpm lint-fix",
-      "prettier --write",
-      "pnpm codegen"
+      "prettier --write"
     ],
     "*.{ts,mts,cts}": [
       "pnpm lint-fix",
