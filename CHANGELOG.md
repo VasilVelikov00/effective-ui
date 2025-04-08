@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.7
+
+### Patch Changes
+
+- [`9eef7ee`](https://github.com/VasilVelikov00/effective-ui/commit/9eef7ee79e57bbadc2ca9ed04048e2b316084b41) Thanks @VasilVelikov00! - Add docs to readme
+
 ## 0.0.6
 
 ### Patch Changes
