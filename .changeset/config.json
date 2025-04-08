@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "https://github.com/VasilVelikov00/effective-ui.git"
+      "repo": "VasilVelikov00/effective-ui"
     }
   ],
   "commit": false,
